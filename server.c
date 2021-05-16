@@ -43,9 +43,11 @@ int server(){
 		perror("Listen failure");	
 	}
 	
-	while(running != 0){
-		if((socket_fd = accept(server_fd, (struct sockaddr* )& address, 			(socklen_t*)&addrlen)) < 0){
-			perror("failure accepting");	
+	while(running != 0){ //vil alltid lete etter nye klienter
+		if(socket_fd < 1){ //hvis det finnes en socket fra før kobles ikke en ny en til
+			if((socket_fd = accept(server_fd, (struct sockaddr* )& address, 			(socklen_t*)&addrlen)) < 0){
+				perror("failure accepting");	
+			}
 		}
 
 		char mottatt[1024];
@@ -53,6 +55,7 @@ int server(){
 		printf("%s", buffer);
 		send(socket_fd, buffer, sizeof(buffer), 0);
 		bzero(buffer, sizeof(buffer));
+
 	}
 
 	return 1;
