@@ -16,6 +16,8 @@ int klient(){
 	
 	struct sockaddr_in serv_addr;
 	char buffer[1024] = {0};
+	char innbuffer[1024] = {0};
+	char* end = "END";
 	
 	//socket descriptor
 	if((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
@@ -37,11 +39,23 @@ int klient(){
 	}
 	while(running != 0){
 		printf(": ");
-		fgets(buffer, sizeof(buffer), stdin);
-		send(socket_fd, &buffer, sizeof(buffer), 0);
+		char* str = fgets(buffer, sizeof(buffer), stdin);
+
+		for(int i = 0; i < strlen(str)-1; i++){
+			usleep(500000);
+			send(socket_fd, &str[i], sizeof(str[i]),0);
+			recv(socket_fd, innbuffer, sizeof(innbuffer),0);
+
+		}
+
+		send(socket_fd, end, sizeof(end),0);
+		recv(socket_fd, innbuffer, sizeof(innbuffer), 0);
+		printf("Motatt fra servr: %s\n", innbuffer);
+
 		bzero(buffer, sizeof(buffer));
-		valread = read(socket_fd, buffer, sizeof(buffer));
-		printf("%s", buffer);
+		bzero(innbuffer, sizeof(innbuffer));
+		//valread = read(socket_fd, buffer, sizeof(buffer));
+		
 
 	}
 	return 1;

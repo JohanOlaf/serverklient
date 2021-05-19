@@ -17,7 +17,8 @@ int server(){
 	struct sockaddr_in address;
 	int opt = 1;
 	int addrlen = sizeof(address);
-	char buffer[256] = {0};//en buffer hvor innkommet skal lande
+	char buffer[1024] = {0};//en buffer hvor innkommet skal lande
+	char str[1024];
 	
 
 	//lager en socket
@@ -49,13 +50,22 @@ int server(){
 				perror("failure accepting");	
 			}
 		}
+		valread = recv(socket_fd, buffer, sizeof(buffer),0);
+		char* temp = buffer;
+		char* end = "END";
 
-		char mottatt[1024];
-		valread = read(socket_fd, buffer, sizeof(buffer));
-		printf("%s", buffer);
-		send(socket_fd, buffer, sizeof(buffer), 0);
+		if(strcmp(temp, end) == 0){
+			send(socket_fd, &str, sizeof(str),0);
+			bzero(str, sizeof(str));
+		}
+		else{
+			strcat(str, buffer);
+			printf("%s\n", str);
+			send(socket_fd, &str, sizeof(str), 0);
+
+		}
 		bzero(buffer, sizeof(buffer));
-
+		
 	}
 
 	return 1;
